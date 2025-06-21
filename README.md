@@ -2,14 +2,14 @@
 <p align="left">A Java-based README file generator using Maven and JSON dependencies.</p>
 
 <p align="left">
-  <a href="https://github.com/{user}/{project}/commits/main">
-    <img src="https://img.shields.io/github/last-commit/{user}/{project}" alt="Last Commit">
+  <a href="https://github.com/l4yoos/readme-generator/commits/main">
+    <img src="https://img.shields.io/github/last-commit/l4yoos/readme-generator" alt="Last Commit">
   </a>
-  <a href="https://github.com/{user}/{project}">
-    <img src="https://img.shields.io/github/languages/top/{user}/{project}" alt="Top Language">
+  <a href="https://github.com/l4yoos/readme-generator">
+    <img src="https://img.shields.io/github/languages/top/l4yoos/readme-generator" alt="Top Language">
   </a>
-  <a href="https://github.com/{user}/{project}">
-    <img src="https://img.shields.io/github/languages/count/{user}/{project}" alt="Language Count">
+  <a href="https://github.com/l4yoos/readme-generator">
+    <img src="https://img.shields.io/github/languages/count/l4yoos/readme-generator" alt="Language Count">
   </a>
 </p>
 
@@ -85,6 +85,4 @@
 <hr/>
 
 <h2 align="left">🎬 Demo</h2>
-<p align="left">A demo of the generated README file is not available.</p>
-
-> 📝 **Note**: Replace {user} and {project} in the badge URLs with your actual GitHub username and repository name.
+![App Demo](demo.gif)
