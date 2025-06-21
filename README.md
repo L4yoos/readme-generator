@@ -85,4 +85,6 @@
 <hr/>
 
 <h2 align="left">🎬 Demo</h2>
-![App Demo](demo.gif)
+<p align="left">
+  <img src="demo.gif" alt="Demo GIF" width="600">
+</p>
