@@ -117,9 +117,7 @@ public class DependencyExtractor {
             String name = it.next();
             String version = deps.optString(name, "unknown");
 
-            if (HeuristicDependencyFilter.isRelevant(name)) {
-                sb.append("- ").append(name).append(" ").append(version).append(suffix).append("\n");
-            }
+            sb.append("- ").append(name).append(" ").append(version).append(suffix).append("\n");
         }
     }
 }

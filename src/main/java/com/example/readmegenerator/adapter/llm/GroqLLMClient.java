@@ -18,8 +18,12 @@ public class GroqLLMClient implements LLMClientPort {
     private final double temperature;
 
     public GroqLLMClient() {
+        this(GroqLLMClient.class.getClassLoader().getResourceAsStream("config.properties"));
+    }
+
+    public GroqLLMClient(InputStream configStream) {
         Properties props = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+        try (InputStream input = configStream) {
             if (input == null) {
                 throw new RuntimeException("Nie znaleziono pliku config.properties w zasobach.");
             }

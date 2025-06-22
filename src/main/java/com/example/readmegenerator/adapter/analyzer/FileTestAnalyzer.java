@@ -12,9 +12,8 @@ public class FileTestAnalyzer implements TestAnalyzerPort {
     public String analyzeTests(List<Path> allFiles) {
         List<Path> testFiles = allFiles.stream()
                 .filter(path -> {
-                    String name = path.getFileName().toString().toLowerCase();
                     String fullPath = path.toString().toLowerCase();
-                    return name.contains("test") || fullPath.contains("/test") || fullPath.contains("\\test");
+                    return fullPath.matches(".*([/\\\\])test([/\\\\].*)?");
                 })
                 .collect(Collectors.toList());
 
@@ -22,7 +21,6 @@ public class FileTestAnalyzer implements TestAnalyzerPort {
             return "🧪 No tests were detected in this project.";
         }
 
-        // Prosty heurystyczny detektor frameworków
         boolean isJUnit = testFiles.stream().anyMatch(p -> p.toString().endsWith(".java"));
         boolean isPytest = testFiles.stream().anyMatch(p -> p.toString().endsWith(".py"));
         boolean isPhpUnit = testFiles.stream().anyMatch(p -> p.toString().endsWith(".php"));

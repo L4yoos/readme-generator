@@ -66,6 +66,7 @@ public class FileProjectAnalyzer implements ProjectAnalyzerPort {
 
         String summary = lines.stream()
                 .filter(filter)
+                .map(String::trim)
                 .limit(10)
                 .collect(Collectors.joining("\n"));
 
@@ -75,7 +76,7 @@ public class FileProjectAnalyzer implements ProjectAnalyzerPort {
 
     private Predicate<String> getLanguageLineFilter(String fileName) {
         if (fileName.endsWith(".cpp") || fileName.endsWith(".c") || fileName.endsWith(".h") || fileName.endsWith(".hpp")) {
-            return line -> line.matches(".*(class|#include|#define|void|int|float|std::string|auto).*");
+            return line -> line.matches("^\\s*(#include|#define|class\\s+\\w+|\\w+\\s+\\w+\\s*\\([^)]*\\)\\s*\\{).*");
         }
 
         return line ->
@@ -87,4 +88,3 @@ public class FileProjectAnalyzer implements ProjectAnalyzerPort {
                         line.contains("def");
     }
 }
-

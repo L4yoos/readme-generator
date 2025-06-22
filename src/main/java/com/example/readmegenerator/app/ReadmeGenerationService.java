@@ -4,6 +4,7 @@ import com.example.readmegenerator.domain.model.ReadmeGenerationConfig;
 import com.example.readmegenerator.domain.port.*;
 import com.example.readmegenerator.domain.service.DependencyExtractor;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -38,21 +39,25 @@ public class ReadmeGenerationService {
     }
 
     public void generate(Path projectDir, ReadmeGenerationConfig config) throws Exception {
-        List<Path> allFiles = Files.walk(projectDir)
-                .filter(Files::isRegularFile)
-                .filter(this::isProjectFile)
-                .collect(Collectors.toList());
+        List<Path> allFiles = listProjectFiles(projectDir);
 
         Set<String> detectedLanguages = languageDetector.detectLanguages(allFiles);
+        if (detectedLanguages.isEmpty()) {
+            return;
+        }
+
         List<Path> relevantFiles = allFiles.stream()
                 .filter(file -> isRelevant(file, detectedLanguages))
                 .collect(Collectors.toList());
+        if (relevantFiles.isEmpty()) {
+            return;
+        }
 
         String projectName = projectDir.getFileName().toString();
         String summary = analyzer.analyze(relevantFiles);
 
         String testSummary = testAnalyzer.analyzeTests(allFiles);
-        if (!testSummary.isBlank()) {
+        if (testSummary != null && !testSummary.isBlank()) {
             summary += "\n\n" + testSummary;
         }
 
@@ -105,5 +110,12 @@ public class ReadmeGenerationService {
         }
 
         return false;
+    }
+
+    protected List<Path> listProjectFiles(Path projectDir) throws IOException {
+        return Files.walk(projectDir)
+                .filter(Files::isRegularFile)
+                .filter(this::isProjectFile)
+                .collect(Collectors.toList());
     }
 }

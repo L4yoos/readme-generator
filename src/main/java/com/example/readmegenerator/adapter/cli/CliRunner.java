@@ -16,9 +16,17 @@ import java.util.Arrays;
 
 public class CliRunner {
     public static void main(String[] args) throws Exception {
+        int exitCode = run(args, new FileProjectAnalyzer(), new GroqLLMClient(), new FileSystemReadmeWriter(),
+                new DefaultLanguageDetector(), new DefaultPromptBuilder(), new FileTestAnalyzer());
+        System.exit(exitCode);
+    }
+
+    static int run(String[] args, ProjectAnalyzerPort analyzer, LLMClientPort client, ReadmeWriterPort writer,
+                   LanguageDetectorPort languageDetector, PromptBuilderPort promptBuilder, TestAnalyzerPort testAnalyzer)
+            throws Exception {
         if (args.length == 0) {
             System.err.println("Użycie: java -jar readmegenerator.jar /ścieżka/do/projektu");
-            System.exit(1);
+            return 1;
         }
 
         Path projectDir = Paths.get(args[0]);
@@ -35,7 +43,7 @@ public class CliRunner {
                     alignment = ReadmeGenerationConfig.HeaderAlignment.valueOf(value);
                 } catch (IllegalArgumentException e) {
                     System.err.println("❌ Nieprawidłowa wartość dla --header-align. Dozwolone: LEFT, CENTER, RIGHT");
-                    System.exit(1);
+                    return 1;
                 }
             } else if (arg.startsWith("--list-style=")) {
                 String value = arg.split("=")[1].toUpperCase();
@@ -43,24 +51,18 @@ public class CliRunner {
                     listStyle = ReadmeGenerationConfig.ListStyle.valueOf(value);
                 } catch (IllegalArgumentException e) {
                     System.err.println("❌ Nieprawidłowa wartość dla --list-style. Dozwolone: BULLET, NUMBERED");
-                    System.exit(1);
+                    return 1;
                 }
             }
         }
 
         ReadmeGenerationConfig config = new ReadmeGenerationConfig(alignment, listStyle);
 
-        ProjectAnalyzerPort analyzer = new FileProjectAnalyzer();
-        LLMClientPort client = new GroqLLMClient();
-        ReadmeWriterPort writer = new FileSystemReadmeWriter();
-        LanguageDetectorPort languageDetector = new DefaultLanguageDetector();
-        PromptBuilderPort promptBuilder = new DefaultPromptBuilder();
-        TestAnalyzerPort testAnalyzer = new FileTestAnalyzer();
-
-        ReadmeGenerationService service = new ReadmeGenerationService(analyzer, client, writer, languageDetector, promptBuilder, testAnalyzer, dryRun, showPrompt);
+        ReadmeGenerationService service = new ReadmeGenerationService(analyzer, client, writer, languageDetector,
+                promptBuilder, testAnalyzer, dryRun, showPrompt);
         service.generate(projectDir, config);
 
         System.out.println("✅ README.md wygenerowany!");
+        return 0;
     }
 }
-
