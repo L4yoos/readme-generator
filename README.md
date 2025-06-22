@@ -1,86 +1,97 @@
 <h1 align="left">readme-generator 📄</h1>
-<p align="left">A Java-based README file generator using Maven and JSON dependencies.</p>
+<p align="left">A Java-based README file generator that uses a Large Language Model (LLM) to generate high-quality README files for projects.</p>
 
 <p align="left">
-  <a href="https://github.com/l4yoos/readme-generator/commits/main">
-    <img src="https://img.shields.io/github/last-commit/l4yoos/readme-generator" alt="Last Commit">
+  <a href="https://github.com/{user}/{project}/commits/main">
+    <img src="https://img.shields.io/github/last-commit/{user}/{project}" alt="Last Commit">
   </a>
-  <a href="https://github.com/l4yoos/readme-generator">
-    <img src="https://img.shields.io/github/languages/top/l4yoos/readme-generator" alt="Top Language">
+  <a href="https://github.com/{user}/{project}">
+    <img src="https://img.shields.io/github/languages/top/{user}/{project}" alt="Top Language">
   </a>
-  <a href="https://github.com/l4yoos/readme-generator">
-    <img src="https://img.shields.io/github/languages/count/l4yoos/readme-generator" alt="Language Count">
+  <a href="https://github.com/{user}/{project}">
+    <img src="https://img.shields.io/github/languages/count/{user}/{project}" alt="Language Count">
   </a>
 </p>
 
 <hr/>
 
 <h2 align="left">🚀 Overview</h2>
-<p align="left">This project generates README files using Java and Maven, leveraging JSON dependencies and a range of plugins for compilation, assembly, and resource management.</p>
+<p align="left">The readme-generator is a Java-based project that uses a Large Language Model (LLM) to generate high-quality README files for projects. The project uses Maven for building and testing, and includes a range of dependencies for language detection, testing, and LLM functionality.</p>
 <ul align="left">
-  <li>Supports Java 17</li>
-  <li>Uses org.json:json for JSON processing</li>
-  <li>Employs Maven plugins for compilation, assembly, and resource management</li>
+  <li>Generates high-quality README files for projects</li>
+  <li>Uses a Large Language Model (LLM) for natural language processing</li>
+  <li>Includes dependencies for language detection, testing, and LLM functionality</li>
 </ul>
 
 <hr/>
 
 <h2 align="left">📦 Built With</h2>
-<p align="left">This project uses the following dependencies and plugins:</p>
+<p align="left">The following dependencies were used in the development of the readme-generator:</p>
 <ul align="left">
   <li>org.json:json (20240303)</li>
-  <li>maven-compiler-plugin (3.8.1)</li>
-  <li>maven-assembly-plugin (3.3.0)</li>
+  <li>org.junit.jupiter:junit-jupiter (RELEASE)</li>
+  <li>org.mockito:mockito-core (5.10.0)</li>
+  <li>com.github.stefanbirkner:system-lambda (1.2.1)</li>
+  <li>org.apache.maven.plugins:maven-compiler-plugin (3.8.1)</li>
+  <li>org.apache.maven.plugins:maven-assembly-plugin (3.3.0)</li>
 </ul>
 
 <hr/>
 
 <h2 align="left">📚 Table of Contents</h2>
-<p align="left">This README file covers the following topics:</p>
+<p align="left">The readme-generator includes the following components:</p>
 <ul align="left">
-  <li>Overview</li>
-  <li>Built With</li>
-  <li>Prerequisites</li>
-  <li>Installation</li>
-  <li>Usage</li>
-  <li>Testing</li>
-  <li>Demo</li>
+  <li>ReadmeGenerationService</li>
+  <li>GroqLLMClient</li>
+  <li>FileSystemReadmeWriter</li>
+  <li>CliRunner</li>
+  <li>DefaultLanguageDetector</li>
+  <li>FileProjectAnalyzer</li>
+  <li>FileTestAnalyzer</li>
+  <li>ReadmeGenerationConfig</li>
+  <li>DependencyExtractor</li>
 </ul>
 
 <hr/>
 
 <h2 align="left">✅ Prerequisites</h2>
-<p align="left">To use this project, you need:</p>
+<p align="left">To use the readme-generator, you will need to have the following installed:</p>
 <ul align="left">
-  <li>Java 17</li>
+  <li>JDK 17</li>
   <li>Maven</li>
-  <li>JSON dependencies</li>
 </ul>
 
 <hr/>
 
 <h2 align="left">🛠️ Installation</h2>
-<p align="left">To install this project, follow these steps:</p>
+<p align="left">To install the readme-generator, you can use the following command:</p>
 <ul align="left">
-  <li>Clone the repository</li>
-  <li>Run `mvn package` to build the project</li>
-  <li>Use the generated JAR file</li>
+  <li>mvn clean package</li>
 </ul>
 
 <hr/>
 
 <h2 align="left">🚀 Usage</h2>
-<p align="left">To use this project, follow these steps:</p>
+<p align="left">To use the readme-generator, you can run the following command:</p>
 <ul align="left">
-  <li>Create a `ReadmeGenerationConfig` instance</li>
-  <li>Use the `ReadmeGenerationService` to generate a README file</li>
-  <li>Customize the generation process using the provided plugins and dependencies</li>
+  <li>java -jar target/readme-generator.jar</li>
 </ul>
 
 <hr/>
 
 <h2 align="left">🧪 Testing</h2>
-<p align="left">This project includes 2 test files using the JUnit framework.</p>
+<p align="left">The readme-generator includes a range of tests using JUnit and Mockito:</p>
+<ul align="left">
+  <li>ReadmeGenerationServiceTest</li>
+  <li>GroqLLMClientTest</li>
+  <li>FileSystemReadmeWriterTest</li>
+  <li>CliRunnerTest</li>
+  <li>DefaultLanguageDetectorTest</li>
+  <li>FileProjectAnalyzerTest</li>
+  <li>FileTestAnalyzerTest</li>
+  <li>ReadmeGenerationConfigTest</li>
+  <li>DependencyExtractorTest</li>
+</ul>
 
 <hr/>
 
