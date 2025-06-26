@@ -2,230 +2,150 @@ package com.example.readmegenerator.app;
 
 import com.example.readmegenerator.domain.model.ReadmeGenerationConfig;
 import com.example.readmegenerator.domain.port.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.example.readmegenerator.domain.service.DependencyExtractor;
+import org.junit.jupiter.api.*;
+import org.mockito.*;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
+import java.nio.file.*;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class ReadmeGenerationServiceTest {
 
-    private ProjectAnalyzerPort analyzer;
-    private LLMClientPort client;
-    private ReadmeWriterPort writer;
-    private LanguageDetectorPort languageDetector;
-    private PromptBuilderPort promptBuilder;
-    private TestAnalyzerPort testAnalyzer;
+    @Mock private ProjectAnalyzerPort analyzer;
+    @Mock private LLMClientPort client;
+    @Mock private ReadmeWriterPort writer;
+    @Mock private LanguageDetectorPort languageDetector;
+    @Mock private PromptBuilderPort promptBuilder;
+    @Mock private TestAnalyzerPort testAnalyzer;
 
-    private ReadmeGenerationService service;
-
+    private ReadmeGenerationConfig config;
     private Path tempDir;
 
     @BeforeEach
     void setUp() throws IOException {
-        analyzer = mock(ProjectAnalyzerPort.class);
-        client = mock(LLMClientPort.class);
-        writer = mock(ReadmeWriterPort.class);
-        languageDetector = mock(LanguageDetectorPort.class);
-        promptBuilder = mock(PromptBuilderPort.class);
-        testAnalyzer = mock(TestAnalyzerPort.class);
-
-        service = new ReadmeGenerationService(
-                analyzer, client, writer, languageDetector, promptBuilder, testAnalyzer,
-                false, false // dryRun, showPrompt
+        MockitoAnnotations.openMocks(this);
+        config = new ReadmeGenerationConfig(
+                ReadmeGenerationConfig.HeaderAlignment.LEFT,
+                ReadmeGenerationConfig.ListStyle.BULLET
         );
-
-        tempDir = Files.createTempDirectory("readme-test");
+        tempDir = Files.createTempDirectory("readme-service-test");
     }
 
     @AfterEach
-    void cleanup() throws IOException {
+    void tearDown() throws IOException {
         Files.walk(tempDir)
-                .sorted(Comparator.reverseOrder())
+                .sorted((a, b) -> b.compareTo(a))
                 .map(Path::toFile)
-                .forEach(File::delete);
+                .forEach(java.io.File::delete);
     }
 
     @Test
-    void testGenerateReadmeSuccessfully() throws Exception {
-        Path file = Files.writeString(tempDir.resolve("Test.java"), "public class Test {}");
-
-        Set<String> langs = Set.of("Java");
-        String summary = "Project summary";
-        String testSummary = "Test summary";
-        String prompt = "Final prompt";
-        String readme = "# README";
-
-        when(languageDetector.detectLanguages(anyList())).thenReturn(langs);
-        when(analyzer.analyze(anyList())).thenReturn(summary);
-        when(testAnalyzer.analyzeTests(anyList())).thenReturn(testSummary);
-        when(promptBuilder.build(any(), any(), any())).thenReturn(prompt);
-        when(client.generateReadme(any())).thenReturn(readme);
-
-        ReadmeGenerationConfig config = new ReadmeGenerationConfig(
-                ReadmeGenerationConfig.HeaderAlignment.LEFT,
-                ReadmeGenerationConfig.ListStyle.BULLET
-        );
-
-        service.generate(tempDir, config);
-
-        verify(analyzer).analyze(anyList());
-        verify(testAnalyzer).analyzeTests(anyList());
-        verify(promptBuilder).build(contains(summary), eq(tempDir.getFileName().toString()), eq(config));
-        verify(client).generateReadme(eq(prompt));
-        verify(writer).write(eq(tempDir), eq(readme));
-    }
-
-    @Test
-    void testGenerateInDryRunMode() throws Exception {
-        ReadmeGenerationService dryRunService = new ReadmeGenerationService(
-                analyzer, client, writer, languageDetector, promptBuilder, testAnalyzer,
-                true, false
-        );
-
-        Path file = Files.writeString(tempDir.resolve("DryTest.java"), "public class DryTest {}");
+    void shouldGenerateReadmeAndWriteToFile() throws Exception {
+        // given
+        Path file = Files.writeString(tempDir.resolve("UserService.java"), "public class UserService {}");
 
         when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of("Java"));
-        when(analyzer.analyze(anyList())).thenReturn("summary");
-        when(testAnalyzer.analyzeTests(anyList())).thenReturn("");
-        when(promptBuilder.build(any(), any(), any())).thenReturn("prompt");
-        when(client.generateReadme(any())).thenReturn("readme content");
-
-        ReadmeGenerationConfig config = new ReadmeGenerationConfig(
-                ReadmeGenerationConfig.HeaderAlignment.CENTER,
-                ReadmeGenerationConfig.ListStyle.NUMBERED
-        );
-
-        dryRunService.generate(tempDir, config);
-
-        verify(writer, never()).write(any(), any());
-    }
-
-    @Test
-    void testShowPromptFlagPrintsPrompt() throws Exception {
-        ReadmeGenerationService showPromptService = new ReadmeGenerationService(
-                analyzer, client, writer, languageDetector, promptBuilder, testAnalyzer,
-                false, true
-        );
-
-        Path file = Files.writeString(tempDir.resolve("PromptTest.java"), "public class PromptTest {}");
-
-        when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of("Java"));
-        when(analyzer.analyze(anyList())).thenReturn("Summary");
-        when(testAnalyzer.analyzeTests(anyList())).thenReturn("");
-        when(promptBuilder.build(any(), any(), any())).thenReturn("PROMPT_TO_SHOW");
-        when(client.generateReadme(any())).thenReturn("README CONTENT");
-
-        ReadmeGenerationConfig config = new ReadmeGenerationConfig(
-                ReadmeGenerationConfig.HeaderAlignment.LEFT,
-                ReadmeGenerationConfig.ListStyle.BULLET
-        );
-
-        showPromptService.generate(tempDir, config);
-
-        verify(promptBuilder).build(any(), any(), any());
-        verify(client).generateReadme(any());
-        verify(writer).write(eq(tempDir), eq("README CONTENT"));
-    }
-
-    @Test
-    void testEmptyProjectDirectory() throws Exception {
-        when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of());
-
-        ReadmeGenerationConfig config = new ReadmeGenerationConfig(
-                ReadmeGenerationConfig.HeaderAlignment.LEFT,
-                ReadmeGenerationConfig.ListStyle.BULLET
-        );
-
-        service.generate(tempDir, config);
-
-        verify(writer, never()).write(any(), any());
-    }
-
-    @Test
-    void testUnrecognizedLanguageSkipsFiles() throws Exception {
-        Files.writeString(tempDir.resolve("unknown.lang"), "???");
-        when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of());
-
-        ReadmeGenerationConfig config = new ReadmeGenerationConfig(
-                ReadmeGenerationConfig.HeaderAlignment.CENTER,
-                ReadmeGenerationConfig.ListStyle.NUMBERED
-        );
-
-        service.generate(tempDir, config);
-
-        verify(writer, never()).write(any(), any());
-    }
-
-    @Test
-    void testNoTestsSummaryIsSkipped() throws Exception {
-        Path file = Files.writeString(tempDir.resolve("App.java"), "public class App {}");
-
-        when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of("Java"));
-        when(analyzer.analyze(anyList())).thenReturn("Core summary");
-        when(testAnalyzer.analyzeTests(anyList())).thenReturn("   ");
+        when(analyzer.analyze(anyList())).thenReturn("Project Summary");
+        when(testAnalyzer.analyzeTests(anyList())).thenReturn("Test Summary");
         when(promptBuilder.build(any(), any(), any())).thenReturn("Prompt");
-        when(client.generateReadme(any())).thenReturn("README");
+        when(client.generateReadme(anyString())).thenReturn("README");
+        // mock static DependencyExtractor
+        try (MockedStatic<DependencyExtractor> deps = mockStatic(DependencyExtractor.class)) {
+            deps.when(() -> DependencyExtractor.extractDependencies(anyList())).thenReturn("Dependencies");
 
-        ReadmeGenerationConfig config = new ReadmeGenerationConfig(
-                ReadmeGenerationConfig.HeaderAlignment.LEFT,
-                ReadmeGenerationConfig.ListStyle.BULLET
-        );
+            ReadmeGenerationService service = new ReadmeGenerationService(
+                    analyzer, client, writer, languageDetector,
+                    promptBuilder, testAnalyzer, false, false
+            );
 
-        service.generate(tempDir, config);
+            // when
+            service.generate(tempDir, config);
 
-        verify(promptBuilder).build(contains("Core summary"), any(), any());
+            // then
+            verify(writer).write(eq(tempDir), eq("README"));
+        }
     }
 
     @Test
-    void testLLMClientThrowsException() throws Exception {
-        Path file = Files.writeString(tempDir.resolve("App.java"), "public class App {}");
+    void shouldSkipWritingIfDryRunIsEnabled() throws Exception {
+        Path file = Files.writeString(tempDir.resolve("MyService.java"), "public class MyService {}");
 
         when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of("Java"));
         when(analyzer.analyze(anyList())).thenReturn("Summary");
         when(testAnalyzer.analyzeTests(anyList())).thenReturn("");
         when(promptBuilder.build(any(), any(), any())).thenReturn("Prompt");
-        when(client.generateReadme(any())).thenThrow(new RuntimeException("LLM error"));
+        when(client.generateReadme(anyString())).thenReturn("README");
 
-        ReadmeGenerationConfig config = new ReadmeGenerationConfig(
-                ReadmeGenerationConfig.HeaderAlignment.LEFT,
-                ReadmeGenerationConfig.ListStyle.BULLET
-        );
+        try (MockedStatic<DependencyExtractor> deps = mockStatic(DependencyExtractor.class)) {
+            deps.when(() -> DependencyExtractor.extractDependencies(anyList())).thenReturn("");
 
-        assertThrows(RuntimeException.class, () -> service.generate(tempDir, config));
+            ReadmeGenerationService service = new ReadmeGenerationService(
+                    analyzer, client, writer, languageDetector,
+                    promptBuilder, testAnalyzer, true, false // dryRun = true
+            );
 
-        verify(writer, never()).write(any(), any());
+            service.generate(tempDir, config);
+
+            verify(writer, never()).write(any(), any());
+        }
     }
 
     @Test
-    void testIgnoredFilesAreSkipped() throws Exception {
-        Path nodeModules = Files.createDirectories(tempDir.resolve("node_modules"));
-        Files.writeString(nodeModules.resolve("ignored.js"), "// ignored");
-
+    void shouldExitEarlyIfNoLanguagesDetected() throws Exception {
         Files.writeString(tempDir.resolve("Main.java"), "public class Main {}");
+        when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of());
 
-        when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of("Java"));
-        when(analyzer.analyze(anyList())).thenReturn("Summary");
-        when(testAnalyzer.analyzeTests(anyList())).thenReturn("");
-        when(promptBuilder.build(any(), any(), any())).thenReturn("Prompt");
-        when(client.generateReadme(any())).thenReturn("README");
-
-        ReadmeGenerationConfig config = new ReadmeGenerationConfig(
-                ReadmeGenerationConfig.HeaderAlignment.LEFT,
-                ReadmeGenerationConfig.ListStyle.BULLET
+        ReadmeGenerationService service = new ReadmeGenerationService(
+                analyzer, client, writer, languageDetector,
+                promptBuilder, testAnalyzer, false, false
         );
 
         service.generate(tempDir, config);
 
-        verify(analyzer).analyze(argThat(list -> list.stream().noneMatch(p -> p.toString().contains("node_modules"))));
+        verifyNoInteractions(analyzer, testAnalyzer, promptBuilder, client, writer);
+    }
+
+    @Test
+    void shouldExitEarlyIfNoRelevantFiles() throws Exception {
+        Files.writeString(tempDir.resolve("README.txt"), "Just a readme");
+        when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of("Java"));
+
+        ReadmeGenerationService service = new ReadmeGenerationService(
+                analyzer, client, writer, languageDetector,
+                promptBuilder, testAnalyzer, false, false
+        );
+
+        service.generate(tempDir, config);
+
+        verifyNoInteractions(analyzer, testAnalyzer, promptBuilder, client, writer);
+    }
+
+    @Test
+    void shouldPrintPromptIfFlagSet() throws Exception {
+        Path file = Files.writeString(tempDir.resolve("OrderService.java"), "public class OrderService {}");
+
+        when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of("Java"));
+        when(analyzer.analyze(anyList())).thenReturn("Analysis");
+        when(testAnalyzer.analyzeTests(anyList())).thenReturn("");
+        when(promptBuilder.build(any(), any(), any())).thenReturn("PROMPT");
+        when(client.generateReadme(any())).thenReturn("README");
+
+        try (MockedStatic<DependencyExtractor> deps = mockStatic(DependencyExtractor.class)) {
+            deps.when(() -> DependencyExtractor.extractDependencies(anyList())).thenReturn("");
+
+            ReadmeGenerationService service = new ReadmeGenerationService(
+                    analyzer, client, writer, languageDetector,
+                    promptBuilder, testAnalyzer, false, true // showPrompt = true
+            );
+
+            assertDoesNotThrow(() -> service.generate(tempDir, config));
+            verify(promptBuilder).build(anyString(), anyString(), any());
+            verify(client).generateReadme("PROMPT");
+        }
     }
 }

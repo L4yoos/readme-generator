@@ -48,6 +48,7 @@ public class ReadmeGenerationService {
 
         List<Path> relevantFiles = allFiles.stream()
                 .filter(file -> isRelevant(file, detectedLanguages))
+                .filter(file -> isCoreDomainFile(file))
                 .collect(Collectors.toList());
         if (relevantFiles.isEmpty()) {
             return;
@@ -117,5 +118,16 @@ public class ReadmeGenerationService {
                 .filter(Files::isRegularFile)
                 .filter(this::isProjectFile)
                 .collect(Collectors.toList());
+    }
+
+    private boolean isCoreDomainFile(Path path) {
+        String name = path.getFileName().toString().toLowerCase();
+        return name.equals("pom.xml") ||
+                name.contains("controller") ||
+                name.contains("service") ||
+                name.contains("application") ||
+                name.contains("model") ||
+                name.contains("entity") ||
+                name.contains("domain");
     }
 }

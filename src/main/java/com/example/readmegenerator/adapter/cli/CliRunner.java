@@ -9,12 +9,16 @@ import com.example.readmegenerator.adapter.prompt.DefaultPromptBuilder;
 import com.example.readmegenerator.app.ReadmeGenerationService;
 import com.example.readmegenerator.domain.model.ReadmeGenerationConfig;
 import com.example.readmegenerator.domain.port.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
 public class CliRunner {
+    private static final Logger logger = LoggerFactory.getLogger(CliRunner.class);
+
     public static void main(String[] args) throws Exception {
         int exitCode = run(args, new FileProjectAnalyzer(), new GroqLLMClient(), new FileSystemReadmeWriter(),
                 new DefaultLanguageDetector(), new DefaultPromptBuilder(), new FileTestAnalyzer());
@@ -25,7 +29,7 @@ public class CliRunner {
                    LanguageDetectorPort languageDetector, PromptBuilderPort promptBuilder, TestAnalyzerPort testAnalyzer)
             throws Exception {
         if (args.length == 0) {
-            System.err.println("Użycie: java -jar readmegenerator.jar /ścieżka/do/projektu");
+            logger.error("Użycie: java -jar readmegenerator.jar /ścieżka/do/projektu");
             return 1;
         }
 
@@ -42,7 +46,7 @@ public class CliRunner {
                 try {
                     alignment = ReadmeGenerationConfig.HeaderAlignment.valueOf(value);
                 } catch (IllegalArgumentException e) {
-                    System.err.println("❌ Nieprawidłowa wartość dla --header-align. Dozwolone: LEFT, CENTER, RIGHT");
+                    logger.error("❌ Nieprawidłowa wartość dla --header-align. Dozwolone: LEFT, CENTER, RIGHT");
                     return 1;
                 }
             } else if (arg.startsWith("--list-style=")) {
@@ -50,7 +54,7 @@ public class CliRunner {
                 try {
                     listStyle = ReadmeGenerationConfig.ListStyle.valueOf(value);
                 } catch (IllegalArgumentException e) {
-                    System.err.println("❌ Nieprawidłowa wartość dla --list-style. Dozwolone: BULLET, NUMBERED");
+                    logger.error("❌ Nieprawidłowa wartość dla --list-style. Dozwolone: BULLET, NUMBERED");
                     return 1;
                 }
             }
@@ -62,7 +66,7 @@ public class CliRunner {
                 promptBuilder, testAnalyzer, dryRun, showPrompt);
         service.generate(projectDir, config);
 
-        System.out.println("✅ README.md wygenerowany!");
+        logger.info("✅ README.md wygenerowany!");
         return 0;
     }
 }

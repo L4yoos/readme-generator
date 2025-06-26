@@ -43,14 +43,30 @@ public class DefaultPromptBuilder implements PromptBuilderPort {
                 "</p>\n" +
                 "```\n\n" +
                 "- Use the following section structure:\n" +
-                "  - `<h2 align=\"" + alignAttr + "\">🚀 Overview</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
-                "  - `<h2 align=\"" + alignAttr + "\">📦 Built With</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
-                "  - `<h2 align=\"" + alignAttr + "\">📚 Table of Contents</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
-                "  - `<h2 align=\"" + alignAttr + "\">✅ Prerequisites</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
-                "  - `<h2 align=\"" + alignAttr + "\">🛠️ Installation</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
-                "  - `<h2 align=\"" + alignAttr + "\">🚀 Usage</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
-                "  - `<h2 align=\"" + alignAttr + "\">🧪 Testing</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
-                "  - `<h2 align=\"" + alignAttr + "\">🎬 Demo</h2>` + `<p align=\"" + alignAttr + "\">...</p>`\n\n" +
+                "  - `<h2 align=\"" + alignAttr + "\" id=\"overview\">🚀 Overview</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
+                "  - `<h2 align=\"" + alignAttr + "\" id=\"built-with\">📦 Built With</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
+                "  - `<h2 align=\"" + alignAttr + "\" id=\"table-of-contents\">📚 Table of Contents</h2>`\n" +
+                "    `<p align=\"" + alignAttr + "\">This README is organized into the following sections:</p>`\n" +
+                "    `<" + listTag + " align=\"" + alignAttr + "\">\n" +
+                "      <li><a href=\"#overview\">Overview</a></li>\n" +
+                "      <li><a href=\"#built-with\">Built With</a></li>\n" +
+                "      <li><a href=\"#table-of-contents\">Table of Contents</a></li>\n" +
+                "      <li><a href=\"#architecture\">Architecture</a></li>\n" +
+                "      <li><a href=\"#prerequisites\">Prerequisites</a></li>\n" +
+                "      <li><a href=\"#installation\">Installation</a></li>\n" +
+                "      <li><a href=\"#usage\">Usage</a></li>\n" +
+                "      <li><a href=\"#testing\">Testing</a></li>\n" +
+                "      <li><a href=\"#demo\">Demo</a></li>\n" +
+                "    </" + listTag + ">`\n" +
+                "  - In the `<h2 id=\"architecture\">🏗️ Architecture</h2>` section:\n" +
+                "  - Analyze the summary and detect architectural patterns like `layered architecture`, `hexagonal`, `onion`, `clean`, or `microservices`.\n" +
+                "  - Describe the architecture with a short paragraph.\n" +
+                "  - If no architecture is mentioned, provide a general structure suggestion based on typical project layout.\n\n" +
+                "  - `<h2 align=\"" + alignAttr + "\" id=\"prerequisites\">✅ Prerequisites</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
+                "  - `<h2 align=\"" + alignAttr + "\" id=\"installation\">🛠️ Installation</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
+                "  - `<h2 align=\"" + alignAttr + "\" id=\"usage\">🚀 Usage</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
+                "  - `<h2 align=\"" + alignAttr + "\" id=\"testing\">🧪 Testing</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
+                "  - `<h2 align=\"" + alignAttr + "\" id=\"demo\">🎬 Demo</h2>` + `<p align=\"" + alignAttr + "\">...</p>`\n\n" +
                 "- Insert `<hr/>` between each section.\n" +
                 "- Use only HTML tags: `<h1>`, `<h2>`, `<p>`, `<" + listTag + ">`, `<li>`, `<hr/>`.\n" +
                 "- Every block must include `align=\"" + alignAttr + "\"`.\n" +

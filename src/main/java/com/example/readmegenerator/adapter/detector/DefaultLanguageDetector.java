@@ -48,7 +48,7 @@ public class DefaultLanguageDetector implements LanguageDetectorPort {
         }
 
         return languageCounts.entrySet().stream()
-                .filter(e -> e.getValue() >= 3) // Tylko języki z min. 3 plikami
+                .filter(e -> e.getValue() >= 3)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
     }

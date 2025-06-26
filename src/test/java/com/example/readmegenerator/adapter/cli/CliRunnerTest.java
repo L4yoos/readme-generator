@@ -46,7 +46,9 @@ class CliRunnerTest {
 
     @Test
     void shouldRunSuccessfullyWithValidArguments() throws Exception {
-        Files.writeString(tempDir.resolve("Main.java"), "public class Main {}");
+        Path srcDir = Files.createDirectories(tempDir.resolve("src/main/java"));
+        Path coreFile = srcDir.resolve("UserService.java");
+        Files.writeString(coreFile, "public class UserService {}");
 
         when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of("Java"));
         when(analyzer.analyze(anyList())).thenReturn("Summary");
@@ -59,6 +61,7 @@ class CliRunnerTest {
         int exitCode = CliRunner.run(args, analyzer, client, writer, languageDetector, promptBuilder, testAnalyzer);
 
         assertEquals(0, exitCode);
+        verify(promptBuilder).build(any(), any(), any());
         verify(writer).write(eq(tempDir), eq("README"));
     }
 
@@ -102,7 +105,9 @@ class CliRunnerTest {
 
     @Test
     void shouldPrintPromptWhenShowPromptFlagIsSet() throws Exception {
-        Files.writeString(tempDir.resolve("ShowPrompt.java"), "public class ShowPrompt {}");
+        Path srcDir = Files.createDirectories(tempDir.resolve("src/main/java"));
+        Path coreFile = srcDir.resolve("OrderService.java");
+        Files.writeString(coreFile, "public class OrderService {}");
 
         when(languageDetector.detectLanguages(anyList())).thenReturn(Set.of("Java"));
         when(analyzer.analyze(anyList())).thenReturn("Summary");

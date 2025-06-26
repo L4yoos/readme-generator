@@ -4,30 +4,22 @@ import com.example.readmegenerator.domain.port.TestAnalyzerPort;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FileTestAnalyzer implements TestAnalyzerPort {
 
     @Override
     public String analyzeTests(List<Path> allFiles) {
-        List<Path> testFiles = allFiles.stream()
-                .filter(path -> {
-                    String fullPath = path.toString().toLowerCase();
-                    return fullPath.matches(".*([/\\\\])test([/\\\\].*)?");
-                })
-                .collect(Collectors.toList());
+        boolean hasTests = allFiles.stream()
+                .anyMatch(path -> {
+                    String filePath = path.toString().toLowerCase();
+                    return filePath.contains("/test/") ||
+                            filePath.contains("\\test\\") ||
+                            filePath.contains("test");
+                });
 
-        if (testFiles.isEmpty()) {
-            return "🧪 No tests were detected in this project.";
-        }
-
-        boolean isJUnit = testFiles.stream().anyMatch(p -> p.toString().endsWith(".java"));
-        boolean isPytest = testFiles.stream().anyMatch(p -> p.toString().endsWith(".py"));
-        boolean isPhpUnit = testFiles.stream().anyMatch(p -> p.toString().endsWith(".php"));
-
-        String framework = isJUnit ? "JUnit" : isPytest ? "PyTest" : isPhpUnit ? "PHPUnit" : "Unknown";
-
-        return String.format("🧪 Detected %d test files using %s framework.", testFiles.size(), framework);
+        return hasTests
+                ? "🧪 This project contains test files."
+                : "";
     }
 }
 
