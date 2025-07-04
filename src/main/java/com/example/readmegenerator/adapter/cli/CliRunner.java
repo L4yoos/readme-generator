@@ -29,7 +29,7 @@ public class CliRunner {
                    LanguageDetectorPort languageDetector, PromptBuilderPort promptBuilder, TestAnalyzerPort testAnalyzer)
             throws Exception {
         if (args.length == 0) {
-            logger.error("Użycie: java -jar readmegenerator.jar /ścieżka/do/projektu");
+            logger.error("Use: java -jar readmegenerator.jar /path/to/project");
             return 1;
         }
 
@@ -46,7 +46,7 @@ public class CliRunner {
                 try {
                     alignment = ReadmeGenerationConfig.HeaderAlignment.valueOf(value);
                 } catch (IllegalArgumentException e) {
-                    logger.error("❌ Nieprawidłowa wartość dla --header-align. Dozwolone: LEFT, CENTER, RIGHT");
+                    logger.error("❌ Invalid value for --header-align. Allowed: LEFT, CENTRE, RIGHT");
                     return 1;
                 }
             } else if (arg.startsWith("--list-style=")) {
@@ -54,7 +54,7 @@ public class CliRunner {
                 try {
                     listStyle = ReadmeGenerationConfig.ListStyle.valueOf(value);
                 } catch (IllegalArgumentException e) {
-                    logger.error("❌ Nieprawidłowa wartość dla --list-style. Dozwolone: BULLET, NUMBERED");
+                    logger.error("❌ Invalid value for --list-style. Allowed: BULLET, NUMBERED");
                     return 1;
                 }
             }
