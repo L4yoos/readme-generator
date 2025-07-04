@@ -25,11 +25,11 @@ public class GroqLLMClient implements LLMClientPort {
         Properties props = new Properties();
         try (InputStream input = configStream) {
             if (input == null) {
-                throw new RuntimeException("Nie znaleziono pliku config.properties w zasobach.");
+                throw new RuntimeException("The config.properties file was not found in the resource.");
             }
             props.load(input);
         } catch (IOException e) {
-            throw new RuntimeException("Błąd podczas ładowania konfiguracji: " + e.getMessage(), e);
+            throw new RuntimeException("Error while loading config: " + e.getMessage(), e);
         }
 
         this.apiUrl = props.getProperty("groq.api.url");
