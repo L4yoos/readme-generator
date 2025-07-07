@@ -1,5 +1,5 @@
-<h1 align="left">readme-generator 📝</h1>
-<p align="left">A Java-based README generator that analyzes project structures and generates documentation.</p>
+<h1 align="left">readme-generator 📄</h1>
+<p align="left">A Maven-based project for generating README files with ease.</p>
 
 <p align="left">
   <a href="https://github.com/l4yoos/readme-generator/commits/main">
@@ -16,24 +16,23 @@
 <hr/>
 
 <h2 align="left" id="overview">🚀 Overview</h2>
-<p align="left">This project provides a Java-based solution for generating README files for projects. It analyzes the project structure and dependencies to create a comprehensive README file.</p>
+<p align="left">This project provides a Maven-based solution for generating README files with ease.</p>
 <ul align="left">
-  <li>Supports Maven projects</li>
-  <li>Analyzes project dependencies and structure</li>
-  <li>Generates a comprehensive README file</li>
+  <li>It utilizes key dependencies such as json, logback-classic, slf4j-api, and snakeyaml.</li>
+  <li>The project contains test files for ensuring the accuracy of the generated README files.</li>
 </ul>
 
 <hr/>
 
 <h2 align="left" id="built-with">📦 Built With</h2>
-<p align="left">This project is built using the following dependencies:</p>
+<p align="left">This project is built using the following core technologies, frameworks, libraries, and CI/CD tools and configurations:</p>
 <ul align="left">
-  <li>org.json:json (20240303)</li>
-  <li>ch.qos.logback:logback-classic (1.4.11)</li>
-  <li>org.slf4j:slf4j-api (2.0.9)</li>
-  <li>org.junit.jupiter:junit-jupiter (RELEASE)</li>
-  <li>org.mockito:mockito-core (5.10.0)</li>
-  <li>com.github.stefanbirkner:system-lambda (1.2.1)</li>
+  <li>Maven</li>
+  <li>Java</li>
+  <li>json</li>
+  <li>logback-classic</li>
+  <li>slf4j-api</li>
+  <li>snakeyaml</li>
 </ul>
 
 <hr/>
@@ -55,16 +54,20 @@
 <hr/>
 
 <h2 align="left" id="architecture">🏗️ Architecture</h2>
-<p align="left">This project follows a layered architecture, with separate components for project analysis, README generation, and testing.</p>
-<p align="left">The `ReadmeGenerationService` class acts as the main entry point, orchestrating the analysis and generation of the README file.</p>
+<p align="left">Based on the project structure, a layered architecture is suggested, with the following layers:</p>
+<ul align="left">
+  <li>Service Layer: Handles the generation of README files.</li>
+  <li>Config Layer: Manages the configuration for README generation.</li>
+  <li>Utils Layer: Provides utility functions for file handling and language detection.</li>
+</ul>
 
 <hr/>
 
 <h2 align="left" id="prerequisites">✅ Prerequisites</h2>
-<p align="left">This project requires the following prerequisites:</p>
+<p align="left">Before getting started, make sure you have the following:</p>
 <ul align="left">
-  <li>Java 17 or later</li>
-  <li>Maven 3.8.1 or later</li>
+  <li>Maven installed on your system.</li>
+  <li>Java Development Kit (JDK) installed on your system.</li>
 </ul>
 
 <hr/>
@@ -72,9 +75,8 @@
 <h2 align="left" id="installation">🛠️ Installation</h2>
 <p align="left">To install this project, follow these steps:</p>
 <ul align="left">
-  <li>Clone the repository</li>
-  <li>Run `mvn clean package` to build the project</li>
-  <li>Use the generated JAR file</li>
+  <li>Clone the repository using `git clone`.</li>
+  <li>Run `mvn install` to build and install the project.</li>
 </ul>
 
 <hr/>
@@ -82,17 +84,17 @@
 <h2 align="left" id="usage">🚀 Usage</h2>
 <p align="left">To use this project, follow these steps:</p>
 <ul align="left">
-  <li>Create an instance of the `ReadmeGenerationService` class</li>
-  <li>Call the `generate` method, passing in the project directory and configuration</li>
-  <li>The generated README file will be written to the specified output directory</li>
+  <li>Create a new instance of `ReadmeGenerationService`.</li>
+  <li>Configure the `ReadmeGenerationConfig` according to your needs.</li>
+  <li>Call the `generate` method to generate the README file.</li>
 </ul>
 
 <hr/>
 
 <h2 align="left" id="testing">🧪 Testing</h2>
-<p align="left">This project includes unit tests and integration tests to ensure correctness and reliability.</p>
+<p align="left">This project contains test files for ensuring the accuracy of the generated README files.</p>
 <ul align="left">
-  <li>Run `mvn test` to execute the tests</li>
+  <li>Run `mvn test` to execute the test suite.</li>
 </ul>
 
 <hr/>
