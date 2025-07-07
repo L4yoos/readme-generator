@@ -22,6 +22,15 @@ public class ReadmeGenerationService {
     private final boolean dryRun;
     private final boolean showPrompt;
 
+    private static final Set<String> CI_CD_PATTERNS = Set.of(
+            ".github/workflows/",
+            "gitlab-ci.yml",
+            ".azure-pipelines/",
+            "jenkinsfile",
+            "circle.yml",
+            ".travis.yml"
+    );
+
     public ReadmeGenerationService(
             ProjectAnalyzerPort analyzer, LLMClientPort client,
             ReadmeWriterPort writer, LanguageDetectorPort languageDetector,
@@ -43,14 +52,16 @@ public class ReadmeGenerationService {
 
         Set<String> detectedLanguages = languageDetector.detectLanguages(allFiles);
         if (detectedLanguages.isEmpty()) {
-            return;
+            System.out.println("No core programming languages detected. Proceeding to check for CI/CD files.");
         }
 
         List<Path> relevantFiles = allFiles.stream()
                 .filter(file -> isRelevant(file, detectedLanguages))
-                .filter(file -> isCoreDomainFile(file))
+                .filter(file -> isCoreDomainFile(file) || isCiCdFile(file))
                 .collect(Collectors.toList());
+
         if (relevantFiles.isEmpty()) {
+            System.out.println("No relevant code or CI/CD files found for README generation.");
             return;
         }
 
@@ -84,18 +95,24 @@ public class ReadmeGenerationService {
     }
 
     private boolean isProjectFile(Path path) {
-        String normalized = path.toString().toLowerCase();
-        return !normalized.contains("node_modules") &&
-                !normalized.contains(".git") &&
-                !normalized.contains("vendor") &&
-                !normalized.contains("build") &&
-                !normalized.contains("dist") &&
-                !normalized.contains("target") &&
-                !normalized.contains("out");
+        String normalized = path.normalize().toString().toLowerCase().replace("\\", "/");
+
+        return !normalized.contains("/node_modules/") &&
+                !normalized.contains("/.git/") &&
+                !normalized.contains("/vendor/") &&
+                !normalized.contains("/build/") &&
+                !normalized.contains("/dist/") &&
+                !normalized.contains("/target/") &&
+                !normalized.contains("/out/") &&
+                !normalized.contains("/.idea/");
     }
 
     private boolean isRelevant(Path path, Set<String> langs) {
         String name = path.getFileName().toString().toLowerCase();
+
+        if (isCiCdFile(path)) {
+            return true;
+        }
 
         if (langs.contains("PHP")) {
             return name.endsWith(".php") || name.equals("composer.json");
@@ -121,6 +138,10 @@ public class ReadmeGenerationService {
     }
 
     private boolean isCoreDomainFile(Path path) {
+        if (isCiCdFile(path)) {
+            return false;
+        }
+
         String name = path.getFileName().toString().toLowerCase();
         return name.equals("pom.xml") ||
                 name.contains("controller") ||
@@ -129,5 +150,20 @@ public class ReadmeGenerationService {
                 name.contains("model") ||
                 name.contains("entity") ||
                 name.contains("domain");
+    }
+
+    private boolean isCiCdFile(Path path) {
+        String fileName = path.getFileName().toString().toLowerCase();
+        String normalizedFullPath = path.normalize().toString().toLowerCase().replace("\\", "/");
+
+        for (String pattern : CI_CD_PATTERNS) {
+            if (pattern.endsWith("/") && normalizedFullPath.contains(pattern)) {
+                return true;
+            }
+            else if (fileName.equals(pattern)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

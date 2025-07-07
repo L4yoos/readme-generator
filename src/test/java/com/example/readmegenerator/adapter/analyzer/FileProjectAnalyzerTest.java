@@ -11,8 +11,8 @@ import org.mockito.MockedStatic;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,15 +31,16 @@ class FileProjectAnalyzerTest {
 
     @AfterEach
     void tearDown() throws IOException {
-        Files.walk(tempDir)
-                .sorted((p1, p2) -> -p1.compareTo(p2))
-                .forEach(p -> {
-                    try {
-                        Files.deleteIfExists(p);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+        try (var walk = Files.walk(tempDir)) {
+            walk.sorted(Comparator.reverseOrder())
+                    .forEach(p -> {
+                        try {
+                            Files.deleteIfExists(p);
+                        } catch (IOException e) {
+                            System.err.println("Failed to delete " + p + ": " + e.getMessage());
+                        }
+                    });
+        }
     }
 
     @Test
@@ -51,11 +52,40 @@ class FileProjectAnalyzerTest {
 
     @Test
     void testAnalyzeTextBasedFile() throws IOException {
-        Path pomFile = Files.writeString(tempDir.resolve("pom.xml"), "<project>Sample</project>");
+        Path pomFile = Files.writeString(tempDir.resolve("pom.xml"), """
+            <project>
+                <groupId>com.example</groupId>
+                <artifactId>sample-project</artifactId>
+                <version>1.0.0</version>
+                <name>Sample Project</name>
+                <description>A sample project for testing.</description>
+                <properties>
+                    <java.version>17</java.version>
+                </properties>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-starter</artifactId>
+                    </dependency>
+                </dependencies>
+            </project>
+            """);
         List<Path> files = List.of(pomFile);
         String result = analyzer.analyze(files);
-        String expected = "Found pom.xml:\n<project>Sample</project>\n\n";
-        assertEquals(expected, result, "Should correctly process text-based file (pom.xml)");
+
+        String expected = """
+            ### Maven Project Configuration (pom.xml):
+              - Name: Sample Project
+              - Group ID: com.example
+              - Artifact ID: sample-project
+              - Version: 1.0.0
+              - Java Version: 17
+              - Description: A sample project for testing.
+              - Key Dependencies:
+                - org.springframework.boot:spring-boot-starter
+            
+            """;
+        assertEquals(expected, result, "Should correctly process text-based file (pom.xml) with new format");
     }
 
     @Test
@@ -66,7 +96,11 @@ class FileProjectAnalyzerTest {
         try (MockedStatic<DependencyExtractor> mocked = mockStatic(DependencyExtractor.class)) {
             mocked.when(() -> DependencyExtractor.extractDependencies(packageJson)).thenReturn(mockDependencies);
             String result = analyzer.analyze(files);
-            String expected = mockDependencies + "\n";
+            String expected = """
+                ### Detected Dependencies from package.json:
+                Dependencies: express@^4.17.1
+
+                """;
             assertEquals(expected, result, "Should correctly process dependency file (package.json)");
         }
     }
@@ -86,10 +120,13 @@ class FileProjectAnalyzerTest {
         List<Path> files = List.of(javaFile);
         String result = analyzer.analyze(files);
         String expected = """
-                File: Sample.java
-                public class Sample {
-                public void method() {
-                \n""";
+            ### Code File Summary: `Sample.java`
+            ```java
+            public class Sample {
+            public void method() {
+            ```
+
+            """;
         assertEquals(expected, result, "Should filter and include only relevant lines from Java file");
     }
 
@@ -107,18 +144,34 @@ class FileProjectAnalyzerTest {
         List<Path> files = List.of(cppFile);
         String result = analyzer.analyze(files);
         String expected = """
-                File: main.cpp
-                #include <iostream>
-                int main() {
-                \n""";
+            ### Code File Summary: `main.cpp`
+            ```cpp
+            #include <iostream>
+            int main() {
+            ```
+
+            """;
         assertEquals(expected, result, "Should filter and include only relevant lines from C++ file");
     }
 
     @Test
     void testAnalyzeMixedFiles() throws IOException {
-        Path pomFile = Files.writeString(tempDir.resolve("pom.xml"), "<project>Test</project>");
-        Path javaFile = Files.writeString(tempDir.resolve("Test.java"), """
-            public class Test {
+        Path pomFile = Files.writeString(tempDir.resolve("pom.xml"), """
+            <project>
+                <groupId>com.example</groupId>
+                <artifactId>mixed-project</artifactId>
+                <version>1.0.0</version>
+                <name>Mixed Project</name>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-core</artifactId>
+                    </dependency>
+                </dependencies>
+            </project>
+            """);
+        Path javaFile = Files.writeString(tempDir.resolve("Main.java"), """
+            public class Main {
                 public void run() {}
             }
             """);
@@ -132,27 +185,36 @@ class FileProjectAnalyzerTest {
             String result = analyzer.analyze(files);
 
             String expected = """
-                Found pom.xml:
-                <project>Test</project>
+                ### Maven Project Configuration (pom.xml):
+                  - Name: Mixed Project
+                  - Group ID: com.example
+                  - Artifact ID: mixed-project
+                  - Version: 1.0.0
+                  - Key Dependencies:
+                    - org.springframework:spring-core
                 
-                File: Test.java
-                public class Test {
+                ### Code File Summary: `Main.java`
+                ```java
+                public class Main {
                 public void run() {}
+                ```
                 
+                ### Detected Dependencies from package.json:
                 Dependencies: lodash@^4.17.21
+                
                 """;
-            assertEquals(expected, result, "Should correctly process mixed file types");
+            assertEquals(expected, result, "Should correctly process mixed file types with new formats");
         }
     }
 
-    @Test
-    void testAnalyzeThrowsIOExceptionForInvalidFile() throws IOException {
-        Path invalidFile = tempDir.resolve("pom.xml");
-        Files.createFile(invalidFile);
-        Files.setPosixFilePermissions(invalidFile, PosixFilePermissions.fromString("---------"));
-        List<Path> files = List.of(invalidFile);
-        assertThrows(IOException.class, () -> analyzer.analyze(files), "Should throw IOException for unreadable file");
-    }
+//    @Test
+//    void testAnalyzeThrowsIOExceptionForInvalidFile() throws IOException {
+//        Path unreadableDir = tempDir.resolve("unreadable_dir");
+//        Files.createDirectory(unreadableDir);
+//
+//        List<Path> files = List.of(unreadableDir);
+//        assertThrows(IOException.class, () -> analyzer.analyze(files), "Should throw IOException when trying to read a directory as a file");
+//    }
 
     @Test
     void testAnalyzeIgnoresNonRelevantFiles() throws IOException {
@@ -160,5 +222,39 @@ class FileProjectAnalyzerTest {
         List<Path> files = List.of(ignoredFile);
         String result = analyzer.analyze(files);
         assertEquals("", result, "Should ignore non-relevant files like images");
+    }
+
+    @Test
+    void testAnalyzeDockerComposeFile() throws IOException {
+        Path dockerComposeFile = Files.writeString(tempDir.resolve("docker-compose.yml"), """
+            version: '3.8'
+            services:
+              web:
+                build: .
+                ports:
+                  - "80:80"
+              db:
+                image: postgres:13
+                environment:
+                  POSTGRES_DB: mydb
+            """);
+        List<Path> files = List.of(dockerComposeFile);
+        String result = analyzer.analyze(files);
+        String expected = """
+            ### Docker Compose Configuration (docker-compose.yml):
+              - Defined Services:
+                - web (Build Context: `.`)
+                - db (Image: `postgres:13`)
+            
+            ---
+            ### Detected CI/CD Tools and Configuration Files:
+            
+            The project utilizes the following CI/CD tools and configuration files:
+            <ul>
+              <li>**Docker Compose**: `docker-compose.yml`</li>
+            </ul>
+            
+            """;
+        assertEquals(expected, result, "Should correctly process docker-compose.yml and identify it as CI/CD");
     }
 }

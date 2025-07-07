@@ -45,6 +45,7 @@ public class DefaultPromptBuilder implements PromptBuilderPort {
                 "- Use the following section structure:\n" +
                 "  - `<h2 align=\"" + alignAttr + "\" id=\"overview\">🚀 Overview</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
                 "  - `<h2 align=\"" + alignAttr + "\" id=\"built-with\">📦 Built With</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
+                "  `<p align=\"" + alignAttr + "\">This project is built using the following core technologies, frameworks, libraries, and **CI/CD tools and configurations**:</p>` + " +
                 "  - `<h2 align=\"" + alignAttr + "\" id=\"table-of-contents\">📚 Table of Contents</h2>`\n" +
                 "    `<p align=\"" + alignAttr + "\">This README is organized into the following sections:</p>`\n" +
                 "    `<" + listTag + " align=\"" + alignAttr + "\">\n" +
