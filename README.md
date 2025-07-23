@@ -1,5 +1,5 @@
 <h1 align="left">readme-generator 📄</h1>
-<p align="left">A Maven-based project for generating README files with ease.</p>
+<p align="left">A Maven-based project for generating README files.</p>
 
 <p align="left">
   <a href="https://github.com/l4yoos/readme-generator/commits/main">
@@ -16,24 +16,25 @@
 <hr/>
 
 <h2 align="left" id="overview">🚀 Overview</h2>
-<p align="left">This project provides a Maven-based solution for generating README files with ease.</p>
+<p align="left">This project provides a Maven-based solution for generating README files. It utilizes various dependencies, including JSON, Logback, SLF4J, and SnakeYAML, to facilitate the generation process.</p>
 <ul align="left">
-  <li>It utilizes key dependencies such as json, logback-classic, slf4j-api, and snakeyaml.</li>
-  <li>The project contains test files for ensuring the accuracy of the generated README files.</li>
+  <li>Supports README generation for various project types.</li>
+  <li>Configurable through the ReadmeGenerationConfig class.</li>
+  <li>Includes test files for ensuring correctness.</li>
 </ul>
 
 <hr/>
 
 <h2 align="left" id="built-with">📦 Built With</h2>
 <p align="left">This project is built using the following core technologies, frameworks, libraries, and CI/CD tools and configurations:</p>
-<ul align="left">
-  <li>Maven</li>
-  <li>Java</li>
-  <li>json</li>
-  <li>logback-classic</li>
-  <li>slf4j-api</li>
-  <li>snakeyaml</li>
-</ul>
+<div align="left">
+  <img src="https://img.shields.io/badge/Maven-0066C9?logo=Maven&logoColor=white&style=for-the-badge" height="30" alt="Maven logo" />
+  <img src="https://img.shields.io/badge/Java-007396?logo=java&logoColor=white&style=for-the-badge" height="30" alt="Java logo" />
+  <img src="https://img.shields.io/badge/JSON-000000?logo=json&logoColor=white&style=for-the-badge" height="30" alt="JSON logo" />
+  <img src="https://img.shields.io/badge/Logback-005571?logo=logback&logoColor=white&style=for-the-badge" height="30" alt="Logback logo" />
+  <img src="https://img.shields.io/badge/SLF4J-005571?logo=slf4j&logoColor=white&style=for-the-badge" height="30" alt="SLF4J logo" />
+  <img src="https://img.shields.io/badge/SnakeYAML-0066C9?logo=snakeyaml&logoColor=white&style=for-the-badge" height="30" alt="SnakeYAML logo" />
+</div>
 
 <hr/>
 
@@ -92,9 +93,9 @@
 <hr/>
 
 <h2 align="left" id="testing">🧪 Testing</h2>
-<p align="left">This project contains test files for ensuring the accuracy of the generated README files.</p>
+<p align="left">This project includes test files to ensure the correctness of the README generation process.</p>
 <ul align="left">
-  <li>Run `mvn test` to execute the test suite.</li>
+  <li>Run the tests using Maven: `mvn test`</li>
 </ul>
 
 <hr/>

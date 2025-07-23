@@ -44,7 +44,11 @@ public class DefaultPromptBuilder implements PromptBuilderPort {
                 "```\n\n" +
                 "- Use the following section structure:\n" +
                 "  - `<h2 align=\"" + alignAttr + "\" id=\"overview\">🚀 Overview</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
-                "  - `<h2 align=\"" + alignAttr + "\" id=\"built-with\">📦 Built With</h2>` + `<p align=\"" + alignAttr + "\">...</p>` + `<" + listTag + " align=\"" + alignAttr + "\">`\n" +
+                "- In the `<h2 align=\"" + alignAttr + "\" id=\"built-with\">📦 Built With</h2>` section, instead of a list, generate a `<div align=\"" + alignAttr + "\">` containing badges for each technology, framework, library, CI/CD tool, etc. Use shields.io badge format, e.g.:\n" +
+                "  `<img src=\"https://img.shields.io/badge/Java-007396?logo=java&logoColor=white&style=for-the-badge\" height=\"30\" alt=\"Java logo\" />`\n" +
+                "  `<img src=\"https://img.shields.io/badge/Kubernetes-326CE5?logo=kubernetes&logoColor=white&style=for-the-badge\" height=\"30\" alt=\"Kubernetes logo\" />`\n" +
+                "  ...\n" +
+                "  All badges should be placed inside the `<div align=\"" + alignAttr + "\">` block.\n" +
                 "  `<p align=\"" + alignAttr + "\">This project is built using the following core technologies, frameworks, libraries, and **CI/CD tools and configurations**:</p>` + " +
                 "  - `<h2 align=\"" + alignAttr + "\" id=\"table-of-contents\">📚 Table of Contents</h2>`\n" +
                 "    `<p align=\"" + alignAttr + "\">This README is organized into the following sections:</p>`\n" +
